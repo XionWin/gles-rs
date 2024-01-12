@@ -253,7 +253,7 @@ extern "C" {
 
     pub fn glGetVertexAttribiv(index: GLuint, pname: GLenum, params: *mut GLint);
 
-    pub fn glGetVertexAttribPointerv(index: GLuint, pname: GLenum, pointer: *mut *mut GLvoid);
+    // pub fn glGetVertexAttribPointerv(index: GLuint, pname: GLenum, pointer: *mut *mut GLvoid);
 
     pub fn glHint(target: GLenum, mode: GLenum);
 
