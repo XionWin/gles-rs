@@ -34,6 +34,7 @@ use std::ffi::CString;
 use std::mem::size_of;
 use std::str::from_utf8;
 
+use crate::StringName;
 use crate::ffi;
 use crate::khronos::{
     khronos_float_t, khronos_int32_t, khronos_int8_t, khronos_intptr_t, khronos_ssize_t,
@@ -1124,9 +1125,9 @@ pub fn get_shader_source(shader: GLuint, max_length: GLsizei) -> Option<String> 
     }
 }
 
-pub fn get_string(name: GLenum) -> Option<String> {
+pub fn get_string(name: StringName) -> Option<String> {
     unsafe {
-        let c_str = ffi::glGetString(name);
+        let c_str = ffi::glGetString(name as _);
 
         if !c_str.is_null() {
             match from_utf8(CStr::from_ptr(c_str).to_bytes()) {
