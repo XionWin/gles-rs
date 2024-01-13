@@ -3,8 +3,10 @@
 
 mod khronos;
 pub(crate) mod ffi;
-mod glesv2;
 mod def;
+mod glesv2;
+mod gfx;
 
-pub use glesv2::*;
 pub use def::*;
+pub use glesv2::*;
+pub use gfx::*;
