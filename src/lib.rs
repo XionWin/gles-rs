@@ -4,9 +4,9 @@
 mod khronos;
 pub(crate) mod ffi;
 mod def;
-mod glesv2;
+mod gles20;
 mod gfx;
 
 pub use def::*;
-pub use glesv2::*;
+pub use gles20::*;
 pub use gfx::*;
