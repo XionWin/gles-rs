@@ -1,6 +1,9 @@
 use libc::{c_char, c_float, c_int, c_uint};
 
-use crate::{def::StringName, ffi, GfxProgram};
+use crate::{
+    def::StringName,
+    ffi, GfxProgram, GfxTexture,
+};
 use std::{
     ffi::{CStr, CString},
     str::from_utf8,
@@ -28,8 +31,20 @@ pub fn get_uniform_location(program: &GfxProgram, name: &str) -> c_int {
     }
 }
 
-pub fn uniform2f(program: &GfxProgram, name: &str, x: c_float, y: c_float) {
-    unsafe { ffi::glUniform2f(get_uniform_location(program, name), x, y) }
+pub fn uniform2i(location: c_int, x: c_int, y: c_int) {
+    unsafe { ffi::glUniform2i(location, x, y) }
+}
+
+pub fn uniform2f(location: c_int, x: c_float, y: c_float) {
+    unsafe { ffi::glUniform2f(location, x, y) }
+}
+
+pub fn uniform_1i(location: c_int, v: c_int) {
+    unsafe { ffi::glUniform1i(location, v) }
+}
+
+pub fn uniform_1f(location: c_int, v: c_float) {
+    unsafe { ffi::glUniform1f(location, v) }
 }
 
 pub fn viewport(x: c_int, y: c_int, width: c_int, height: c_int) {
@@ -122,5 +137,118 @@ pub fn enable_vertex_attrib_array(index: c_uint) {
 pub fn draw_arrays(begin_mode: crate::def::BeginMode, first: c_int, count: c_int) {
     unsafe {
         crate::ffi::glDrawArrays(begin_mode as _, first, count);
+    }
+}
+
+pub fn draw_elements<T>(
+    begin_mode: crate::def::BeginMode,
+    count: c_int,
+    draw_elements_type: crate::def::DrawElementsType,
+    indices: Option<&[T]>,
+) {
+    unsafe {
+        crate::ffi::glDrawElements(
+            begin_mode as _,
+            match indices {
+                Some(i) => std::cmp::min(count, i.len() as _),
+                None => count,
+            },
+            draw_elements_type as _,
+            match indices {
+                Some(i) => i.as_ptr() as *const _,
+                None => std::ptr::null(),
+            },
+        )
+    }
+}
+
+pub fn gen_textures(n: c_int) -> Vec<c_uint> {
+    unsafe {
+        let mut result = std::vec::from_elem(0, n as _);
+        crate::ffi::glGenTextures(n, result.as_mut_ptr());
+        return result;
+    }
+}
+
+pub fn gen_texture() -> c_uint {
+    gen_textures(1)[0]
+}
+
+pub fn delete_textures(textures: &mut [c_uint]) {
+    unsafe { crate::ffi::glDeleteTextures(textures.len() as _, textures.as_mut_ptr()) }
+}
+
+pub fn delete_texture(texture: c_uint) {
+    delete_textures(&mut vec![texture])
+}
+
+pub fn active_texture(texture_unit: crate::def::TextureUnit) {
+    unsafe {
+        crate::ffi::glActiveTexture(texture_unit as _);
+    }
+}
+
+pub fn bind_texture(texture_target: crate::def::TextureTarget, texture: &GfxTexture) {
+    unsafe {
+        crate::ffi::glBindTexture(texture_target as _, texture.id);
+    }
+}
+
+// FIXME: Does not verify buffer size -- unsafe!
+pub fn tex_image_2d<T>(
+    texture_target: crate::def::TextureTarget,
+    level: c_int,
+    internal_format: crate::def::PixelInternalFormat,
+    width: c_int,
+    height: c_int,
+    border: c_int,
+    format: crate::def::PixelFormat,
+    ty: crate::def::PixelType,
+    opt_data: Option<&[T]>,
+) {
+    match opt_data {
+        Some(data) => unsafe {
+            let pdata = data.as_ptr() as *const _;
+            crate::ffi::glTexImage2D(
+                texture_target as _,
+                level,
+                internal_format as _,
+                width,
+                height,
+                border,
+                format as _,
+                ty as _,
+                pdata,
+            );
+        },
+        None => unsafe {
+            crate::ffi::glTexImage2D(
+                texture_target as _,
+                level,
+                internal_format as _,
+                width,
+                height,
+                border,
+                format as _,
+                ty as _,
+                std::ptr::null(),
+            );
+        },
+    }
+}
+
+pub fn tex_parameter_i(
+    texture_target: crate::def::TextureTarget,
+    texture_param_name: crate::def::TextureParameterName,
+    value: c_int,
+) {
+    unsafe {
+        crate::ffi::glTexParameteri(texture_target as _, texture_param_name as _, value);
+    }
+}
+
+pub fn generate_mipmap(generate_mipmap_target: crate::def::GenerateMipmapTarget) {
+    unsafe {
+        crate::ffi::glGenerateMipmap(generate_mipmap_target as _);
     }
 }

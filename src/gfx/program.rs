@@ -8,6 +8,8 @@ pub struct GfxProgram
     pub(crate) id: c_uint,
     pub(crate) vertex_shader: super::GfxShader,
     pub(crate) fragment_shader: super::GfxShader,
+    
+    pub(crate) textures: Vec<super::GfxTexture>,
 }
 
 impl GfxProgram {
@@ -17,7 +19,8 @@ impl GfxProgram {
                 crate::ffi::glCreateProgram()
             },
             vertex_shader: super::GfxShader::new(crate::def::ShaderType::VertexShader, vertex_shader_path).load(),
-            fragment_shader: super::GfxShader::new(crate::def::ShaderType::FragmentShader, fragment_shader_path).load()
+            fragment_shader: super::GfxShader::new(crate::def::ShaderType::FragmentShader, fragment_shader_path).load(),
+            textures: Vec::new()
         }
     }
 
@@ -33,6 +36,10 @@ impl GfxProgram {
             crate::ffi::glUseProgram(self.id);
             check_link(self);
         }
+    }
+    
+    pub fn add_texture(&mut self, texture: super::GfxTexture) {
+        self.textures.push(texture)
     }
 }
 
