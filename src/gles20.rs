@@ -40,3 +40,11 @@ pub fn clear(mask: c_uint) {
 pub fn clear_color(red: c_float, green: c_float, blue: c_float, alpha: c_float) {
     unsafe { ffi::glClearColor(red, green, blue, alpha) }
 }
+
+pub fn gen_buffers(n: c_int) -> Vec<c_uint> {
+    let mut buffer = std::vec::from_elem(0, n as _);
+    unsafe {
+        crate::ffi::glGenBuffers(n, buffer.as_mut_ptr());
+    }
+    buffer
+}
