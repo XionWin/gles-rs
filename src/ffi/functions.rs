@@ -241,7 +241,12 @@ extern "C" {
         infolog: *mut GLchar,
     );
 
-    pub fn glGetShaderPrecisionFormat(shadertype: GLenum, precisiontype: GLenum, range: *const GLint, precision: *const GLint);
+    pub fn glGetShaderPrecisionFormat(
+        shadertype: GLenum,
+        precisiontype: GLenum,
+        range: *const GLint,
+        precision: *const GLint,
+    );
 
     pub fn glGetShaderSource(
         shader: GLuint,
@@ -317,7 +322,13 @@ extern "C" {
 
     pub fn glScissor(x: GLint, y: GLint, width: GLsizei, height: GLsizei);
 
-    pub fn glShaderBinary(n: GLsizei, shaders: *const GLuint, binaryformat: GLenum, binary: *const GLvoid, length: GLsizei);
+    pub fn glShaderBinary(
+        n: GLsizei,
+        shaders: *const GLuint,
+        binaryformat: GLenum,
+        binary: *const GLvoid,
+        length: GLsizei,
+    );
 
     pub fn glShaderSource(
         shader: GLuint,
@@ -451,7 +462,7 @@ extern "C" {
         stride: GLsizei,
         ptr: *const GLvoid,
     );
-    
+
     pub fn glVertexAttribDivisor(indx: GLuint, divisor: GLuint);
 
     pub fn glViewport(x: GLint, y: GLint, width: GLsizei, height: GLsizei);

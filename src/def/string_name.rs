@@ -1,8 +1,8 @@
 #[repr(u32)]
 pub enum StringName {
-    Vendor = 0x1F00,
-    Renderer = 0x1F01,
-    Version = 0x1F02,
-    Extensions = 0x1F03,
-    ShadingLanguageVersion = 0x8B8C,
+    Vendor = crate::ffi::GL_VENDOR,
+    Renderer = crate::ffi::GL_RENDERER,
+    Version = crate::ffi::GL_VERSION,
+    Extensions = crate::ffi::GL_EXTENSIONS,
+    ShadingLanguageVersion = crate::ffi::GL_SHADING_LANGUAGE_VERSION,
 }
