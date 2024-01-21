@@ -14,7 +14,7 @@ impl crate::GfxShader {
 fn check_compile(shader: super::GfxShader) -> super::GfxShader {
     let mut is_compiled = 0;
     unsafe {
-        crate::ffi::glGetShaderiv(shader.id, crate::GL_COMPILE_STATUS, &mut is_compiled);
+        crate::ffi::glGetShaderiv(shader.id, crate::ffi::GL_COMPILE_STATUS, &mut is_compiled);
     }
     if is_compiled == 0 {
         panic!("GLES shader compile faild");

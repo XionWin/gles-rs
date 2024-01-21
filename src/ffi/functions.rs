@@ -1,6 +1,10 @@
+use libc::c_int;
+
 use super::*;
 
+#[link(name = "GLESv2")]
 extern "C" {
+
     pub fn glActiveTexture(texture: GLenum);
 
     pub fn glAttachShader(program: GLuint, shader: GLuint);
@@ -14,6 +18,8 @@ extern "C" {
     pub fn glBindRenderbuffer(target: GLenum, renderbuffer: GLuint);
 
     pub fn glBindTexture(target: GLenum, texture: GLuint);
+
+    pub fn glBindVertexArray(array: GLuint);
 
     pub fn glBlendColor(red: GLclampf, green: GLclampf, blue: GLclampf, alpha: GLclampf);
 
@@ -90,7 +96,7 @@ extern "C" {
 
     pub fn glCreateProgram() -> GLuint;
 
-    pub fn glCreateShader(type_: GLenum) -> GLuint;
+    pub fn glCreateShader(_type: GLenum) -> GLuint;
 
     pub fn glCullFace(mode: GLenum);
 
@@ -120,7 +126,17 @@ extern "C" {
 
     pub fn glDrawArrays(mode: GLenum, first: GLint, count: GLsizei);
 
-    pub fn glDrawElements(mode: GLenum, count: GLsizei, type_: GLenum, indices: *const GLvoid);
+    pub fn glDrawElements(mode: GLenum, count: GLsizei, _type: GLenum, indices: *const GLvoid);
+
+    pub fn glDrawArraysInstanced(mode: GLenum, first: GLint, count: GLsizei, primcount: GLsizei);
+
+    pub fn glDrawElementsInstanced(
+        mode: GLenum,
+        count: GLsizei,
+        _type: GLenum,
+        indices: *const GLvoid,
+        primcount: GLsizei,
+    );
 
     pub fn glEnable(cap: GLenum);
 
@@ -157,13 +173,15 @@ extern "C" {
 
     pub fn glGenTextures(n: GLsizei, textures: *mut GLuint);
 
+    pub fn glGenVertexArrays(n: GLsizei, arrays: *mut GLuint);
+
     pub fn glGetActiveAttrib(
         program: GLuint,
         index: GLuint,
         bufsize: GLsizei,
         length: *mut GLsizei,
         size: *mut GLint,
-        type_: *mut GLenum,
+        _type: *mut GLenum,
         name: *mut GLchar,
     );
 
@@ -173,7 +191,7 @@ extern "C" {
         bufsize: GLsizei,
         length: *mut GLsizei,
         size: *mut GLint,
-        type_: *mut GLenum,
+        _type: *mut GLenum,
         name: *mut GLchar,
     );
 
@@ -184,7 +202,7 @@ extern "C" {
         shaders: *mut GLuint,
     );
 
-    pub fn glGetAttribLocation(program: GLuint, name: *const GLchar) -> GLint;
+    pub fn glGetAttribLocation(program: GLuint, name: *const GLchar) -> c_int;
 
     pub fn glGetBooleanv(pname: GLenum, params: *mut GLboolean);
 
@@ -223,12 +241,7 @@ extern "C" {
         infolog: *mut GLchar,
     );
 
-    pub fn glGetShaderPrecisionFormat(
-        shadertype: GLenum,
-        precisiontype: GLenum,
-        range: *mut GLint,
-        precision: *mut GLint,
-    );
+    pub fn glGetShaderPrecisionFormat(shadertype: GLenum, precisiontype: GLenum, range: *const GLint, precision: *const GLint);
 
     pub fn glGetShaderSource(
         shader: GLuint,
@@ -247,13 +260,13 @@ extern "C" {
 
     pub fn glGetUniformiv(program: GLuint, location: GLint, params: *mut GLint);
 
-    pub fn glGetUniformLocation(program: GLuint, name: *const GLchar) -> GLint;
+    pub fn glGetUniformLocation(program: GLuint, name: *const GLchar) -> c_int;
 
     pub fn glGetVertexAttribfv(index: GLuint, pname: GLenum, params: *mut GLfloat);
 
     pub fn glGetVertexAttribiv(index: GLuint, pname: GLenum, params: *mut GLint);
 
-    // pub fn glGetVertexAttribPointerv(index: GLuint, pname: GLenum, pointer: *mut *mut GLvoid);
+    pub fn glGetVertexAttribPointerv(index: GLuint, pname: GLenum, pointer: *mut *mut GLvoid);
 
     pub fn glHint(target: GLenum, mode: GLenum);
 
@@ -279,13 +292,15 @@ extern "C" {
 
     pub fn glPolygonOffset(factor: GLfloat, units: GLfloat);
 
+    pub fn glPolygonMode(face: GLenum, mode: GLenum);
+
     pub fn glReadPixels(
         x: GLint,
         y: GLint,
         width: GLsizei,
         height: GLsizei,
         format: GLenum,
-        type_: GLenum,
+        _type: GLenum,
         pixels: *mut GLvoid,
     );
 
@@ -302,13 +317,7 @@ extern "C" {
 
     pub fn glScissor(x: GLint, y: GLint, width: GLsizei, height: GLsizei);
 
-    pub fn glShaderBinary(
-        n: GLsizei,
-        shaders: *const GLuint,
-        binaryformat: GLenum,
-        binary: *const GLvoid,
-        length: GLsizei,
-    );
+    pub fn glShaderBinary(n: GLsizei, shaders: *const GLuint, binaryformat: GLenum, binary: *const GLvoid, length: GLsizei);
 
     pub fn glShaderSource(
         shader: GLuint,
@@ -317,17 +326,17 @@ extern "C" {
         length: *const GLint,
     );
 
-    pub fn glStencilFunc(func: GLenum, ref_: GLint, mask: GLuint);
+    pub fn glStencilFunc(func: GLenum, reference: GLint, mask: GLuint);
 
-    pub fn glStencilFuncSeparate(face: GLenum, func: GLenum, ref_: GLint, mask: GLuint);
+    pub fn glStencilFuncSeparate(face: GLenum, func: GLenum, reference: GLint, mask: GLuint);
 
     pub fn glStencilMask(mask: GLuint);
 
     pub fn glStencilMaskSeparate(face: GLenum, mask: GLuint);
 
-    pub fn glStencilOp(fail: GLenum, zfail: GLenum, zpass: GLenum);
+    pub fn glStencilOp(_fail: GLenum, zfail: GLenum, zpass: GLenum);
 
-    pub fn glStencilOpSeparate(face: GLenum, fail: GLenum, zfail: GLenum, zpass: GLenum);
+    pub fn glStencilOpSeparate(face: GLenum, _fail: GLenum, zfail: GLenum, zpass: GLenum);
 
     pub fn glTexImage2D(
         target: GLenum,
@@ -337,7 +346,7 @@ extern "C" {
         height: GLsizei,
         border: GLint,
         format: GLenum,
-        type_: GLenum,
+        _type: GLenum,
         pixels: *const GLvoid,
     );
 
@@ -357,7 +366,7 @@ extern "C" {
         width: GLsizei,
         height: GLsizei,
         format: GLenum,
-        type_: GLenum,
+        _type: GLenum,
         pixels: *const GLvoid,
     );
 
@@ -437,11 +446,17 @@ extern "C" {
     pub fn glVertexAttribPointer(
         indx: GLuint,
         size: GLint,
-        type_: GLenum,
+        _type: GLenum,
         normalized: GLboolean,
         stride: GLsizei,
         ptr: *const GLvoid,
     );
+    
+    pub fn glVertexAttribDivisor(indx: GLuint, divisor: GLuint);
 
     pub fn glViewport(x: GLint, y: GLint, width: GLsizei, height: GLsizei);
+
+    #[cfg(target_os = "android")]
+    pub fn glEGLImageTargetTexture2DOES(target: GLenum, image: GLeglImageOES);
+    pub fn glEGLImageTargetRenderbufferStorageOES(target: GLenum, image: GLeglImageOES);
 }

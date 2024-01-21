@@ -1,6 +1,6 @@
 use libc::*;
 
-use crate::{GL_LINK_STATUS, GL_INFO_LOG_LENGTH};
+use crate::ffi::{GL_LINK_STATUS, GL_INFO_LOG_LENGTH};
 
 #[derive(Debug)]
 pub struct GfxProgram
