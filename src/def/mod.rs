@@ -16,6 +16,8 @@ mod texture_wrap_mode;
 mod draw_element_type;
 mod enable_cap;
 mod blending_factor;
+#[allow(non_snake_case)]
+mod all;
 
 pub use string_name::*;
 pub use shader_type::*;
@@ -35,3 +37,4 @@ pub use texture_wrap_mode::*;
 pub use draw_element_type::*;
 pub use enable_cap::*;
 pub use blending_factor::*;
+pub use all::*;

@@ -16,5 +16,12 @@ pub enum PixelFormat {
     CmykExt = 32780,
     CmykaExt = 32781,
     Ycrcb422Sgix = 33211,
-    Ycrcb444Sgix = 33212
+    Ycrcb444Sgix = 33212,
+    Rg = 33319,
+    R8 = 33321,
+    R16 = 33322,
+    Rg8 = 33323,
+    Rg16 = 33324,
+    R16f = 33325,
+    R32f = 33326,
 }

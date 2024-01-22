@@ -114,15 +114,14 @@ pub fn check_link_status(program_id: c_uint) {
         crate::ffi::glGetProgramiv(program_id, ffi::GL_LINK_STATUS, &mut is_linked);
     }
     if is_linked == 0 {
-        match get_program_linked_information(program_id) {
+        match get_program_information(program_id) {
             Some(msg) => panic!("GLES program link faild error: {:?}", msg),
             None => panic!("GLES program link faild error: NONE"),
         }
     }
 }
 
-#[inline]
-fn get_program_linked_information(program_id: c_uint) -> Option<String> {
+pub fn get_program_information(program_id: c_uint) -> Option<String> {
     let mut len = 0;
     unsafe {
         crate::ffi::glGetProgramiv(program_id, ffi::GL_INFO_LOG_LENGTH, &mut len);
@@ -134,6 +133,23 @@ fn get_program_linked_information(program_id: c_uint) -> Option<String> {
                 crate::ffi::glGetProgramInfoLog(program_id, len, std::ptr::null_mut::<libc::c_int>(), buf.as_mut_ptr());
             }
             Some(String::from_utf8(buf).expect("GLES glGetProgramInfoLog error"))
+        },
+        _ => None,
+    }
+}
+
+pub fn get_shader_information(shader_id: c_uint) -> Option<String> {
+    let mut len = 0;
+    unsafe {
+        crate::ffi::glGetShaderiv(shader_id, ffi::GL_INFO_LOG_LENGTH, &mut len);
+    }
+    match len {
+        len if len > 0 => {
+            let mut buf = vec![0u8; len as _];
+            unsafe {
+                crate::ffi::glGetShaderInfoLog(shader_id, len, std::ptr::null_mut::<libc::c_int>(), buf.as_mut_ptr());
+            }
+            Some(String::from_utf8(buf).expect("GLES glGetShaderInfoLog error"))
         },
         _ => None,
     }
@@ -181,6 +197,14 @@ pub fn gen_vertex_arrays(n: c_int, array: *mut c_uint) {
     }
 }
 
+pub fn gen_vertex_array() -> c_uint {
+    let mut buffer = 0u32;
+    unsafe {
+        crate::ffi::glGenVertexArrays(1, &mut buffer);
+    }
+    buffer
+}
+
 pub fn bind_vertex_array(array_id: c_uint) {
     unsafe {
         crate::ffi::glBindVertexArray(array_id);
@@ -191,6 +215,14 @@ pub fn gen_buffers(n: c_int) -> Vec<c_uint> {
     let mut buffer = std::vec::from_elem(0, n as _);
     unsafe {
         crate::ffi::glGenBuffers(n, buffer.as_mut_ptr());
+    }
+    buffer
+}
+
+pub fn gen_buffer() -> c_uint {
+    let mut buffer = 0u32;
+    unsafe {
+        crate::ffi::glGenBuffers(1, &mut buffer);
     }
     buffer
 }
@@ -320,6 +352,12 @@ pub fn bind_texture(texture_target: crate::def::TextureTarget, texture_id: c_uin
     }
 }
 
+pub fn pixel_storei(pname: crate::def::ALL, param: c_int) {
+    unsafe {
+        crate::ffi::glPixelStorei(pname as _, param);
+    }
+}
+
 // FIXME: Does not verify buffer size -- unsafe!
 pub fn tex_image_2d<T>(
     texture_target: crate::def::TextureTarget,
@@ -363,24 +401,96 @@ pub fn tex_image_2d<T>(
     }
 }
 
+pub fn tex_sub_image_2d<T>(
+    texture_target: crate::def::TextureTarget,
+    level: c_int,
+    xoffset: c_int,
+    yoffset: c_int,
+    width: c_int,
+    height: c_int,
+    format: crate::def::PixelFormat,
+    ty: crate::def::PixelType,
+    opt_data: Option<&[T]>,
+) {
+    match opt_data {
+        Some(data) => unsafe {
+            let pdata = data.as_ptr() as *const _;
+            crate::ffi::glTexSubImage2D(
+                texture_target as _,
+                level,
+                xoffset,
+                yoffset,
+                width,
+                height,
+                format as _,
+                ty as _,
+                pdata,
+            );
+        },
+        None => unsafe {
+            crate::ffi::glTexSubImage2D(
+                texture_target as _,
+                level,
+                xoffset,
+                yoffset,
+                width,
+                height,
+                format as _,
+                ty as _,
+                std::ptr::null(),
+            );
+        },
+    }
+}
+
 pub fn tex_parameter_i(
     texture_target: crate::def::TextureTarget,
     texture_param_name: crate::def::TextureParameterName,
     value: c_int,
 ) {
     unsafe {
-        crate::ffi::glTexParameteri(texture_target as _, texture_param_name as _, value);
+        crate::ffi::glTexParameteri(texture_target as _, texture_param_name as _, value)
     }
 }
 
 pub fn generate_mipmap(generate_mipmap_target: crate::def::GenerateMipmapTarget) {
     unsafe {
-        crate::ffi::glGenerateMipmap(generate_mipmap_target as _);
+        crate::ffi::glGenerateMipmap(generate_mipmap_target as _)
     }
 }
 
 pub fn blend_func(sfactor: crate::def::BlendingFactor, dfactor: crate::def::BlendingFactor) {
     unsafe {
-        crate::ffi::glBlendFunc(sfactor as _, dfactor as _);
+        crate::ffi::glBlendFunc(sfactor as _, dfactor as _)
     }
+}
+
+pub fn stencil_mask(mask: c_uint) {
+    unsafe { crate::ffi::glStencilMask(mask) }
+}
+
+pub fn stencil_func(func: crate::def::ALL, reference: c_int, mask: c_uint) {
+    unsafe { crate::ffi::glStencilFunc(func as _, reference, mask) }
+}
+
+pub fn color_mask(red: bool, green: bool, blue: bool, alpha: bool) {
+    unsafe { crate::ffi::glColorMask(red as _, green as _, blue as _, alpha as _) }
+}
+
+pub fn stencil_op(fail: crate::def::ALL, zfail: crate::def::ALL, zpass: crate::def::ALL) {
+    unsafe { crate::ffi::glStencilOp(fail as _, zfail as _, zpass as _) }
+}
+
+pub fn stencil_op_separate(face: crate::def::ALL, fail: crate::def::ALL, zfail: crate::def::ALL, zpass: crate::def::ALL) {
+    unsafe { crate::ffi::glStencilOpSeparate(face as _, fail as _, zfail as _, zpass as _) }
+}
+
+
+
+pub fn flush() {
+    unsafe { crate::ffi::glFlush() }
+}
+
+pub fn finish() {
+    unsafe { crate::ffi::glFinish() }
 }
