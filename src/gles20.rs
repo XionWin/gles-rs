@@ -36,10 +36,114 @@ pub fn disable(enale_cap: crate::def::EnableCap) {
     }
 }
 
-pub fn get_uniform_location(program: &GfxProgram, name: &str) -> c_int {
+pub fn create_program() -> c_uint {
+    unsafe {
+        crate::ffi::glCreateProgram()
+    }
+}
+
+pub fn delete_program(program_id: c_uint)  {
+    unsafe {
+        crate::ffi::glDeleteProgram(program_id)
+    }
+}
+
+pub fn create_shader(shader_type: crate::def::ShaderType) -> c_uint {
+    unsafe {
+        crate::ffi::glCreateShader(shader_type as _)
+    }
+}
+
+pub fn delete_shader(shader_id: c_uint)  {
+    unsafe {
+        crate::ffi::glDeleteShader(shader_id)
+    }
+}
+
+pub fn shader_source(shader_id: c_uint, source_code: &str)  { 
+    let mut source = source_code.bytes().collect::<Vec<libc::c_char>>();
+    source.push(b'\0');
+    let sources = vec![source.as_ptr()];
+    unsafe {
+        crate::ffi::glShaderSource(shader_id, 1, sources.as_ptr(), std::ptr::null())
+    }
+}
+
+pub fn compile_shader(shader_id: c_uint)  {
+    unsafe {
+        crate::ffi::glCompileShader(shader_id)
+    }
+}
+
+pub fn get_shaderiv(shader_id: c_uint) -> c_int {
+    let mut is_compiled = 0;
+    unsafe {
+        crate::ffi::glGetShaderiv(shader_id, crate::ffi::GL_COMPILE_STATUS, &mut is_compiled);
+    }
+    is_compiled
+}
+
+pub fn attach_shader(program_id: c_uint, shader_id: c_uint) {
+    unsafe {
+        crate::ffi::glAttachShader(program_id, shader_id)
+    }
+}
+
+pub fn link_program(program_id: c_uint) {
+    unsafe {
+        crate::ffi::glLinkProgram(program_id)
+    }
+}
+
+pub fn use_program(program_id: c_uint) {
+    unsafe {
+        crate::ffi::glUseProgram(program_id)
+    }
+}
+
+pub fn bind_attrib_location(program_id: c_uint, index: c_uint, name: &str) {
+    let c_str = CString::new(name).unwrap();
+    unsafe {
+        crate::ffi::glBindAttribLocation(program_id, index , c_str.as_ptr())
+    }
+}
+
+pub fn check_link_status(program_id: c_uint) {
+    let mut is_linked = 0;
+    unsafe {
+        crate::ffi::glGetProgramiv(program_id, ffi::GL_LINK_STATUS, &mut is_linked);
+    }
+    if is_linked == 0 {
+        match get_program_linked_information(program_id) {
+            Some(msg) => panic!("GLES program link faild error: {:?}", msg),
+            None => panic!("GLES program link faild error: NONE"),
+        }
+    }
+}
+
+#[inline]
+fn get_program_linked_information(program_id: c_uint) -> Option<String> {
+    let mut len = 0;
+    unsafe {
+        crate::ffi::glGetProgramiv(program_id, ffi::GL_INFO_LOG_LENGTH, &mut len);
+    }
+    match len {
+        len if len > 0 => {
+            let mut buf = vec![0u8; len as _];
+            unsafe {
+                crate::ffi::glGetProgramInfoLog(program_id, len, std::ptr::null_mut::<libc::c_int>(), buf.as_mut_ptr());
+            }
+            Some(String::from_utf8(buf).expect("GLES glGetProgramInfoLog error"))
+        },
+        _ => None,
+    }
+}
+
+
+pub fn get_uniform_location(program_id: c_uint, name: &str) -> c_int {
     unsafe {
         let c_str = CString::new(name).unwrap();
-        ffi::glGetUniformLocation(program.id, c_str.as_ptr() as *const c_char)
+        ffi::glGetUniformLocation(program_id, c_str.as_ptr() as *const c_char)
     }
 }
 
@@ -110,6 +214,16 @@ pub fn buffer_data<T>(
             usage as _,
         );
     }
+}
+
+pub fn delete_buffers(n: c_int, buffer_ids: &[c_uint]) {
+    unsafe {
+        crate::ffi::glDeleteBuffers(n,buffer_ids.as_ptr());
+    }
+}
+
+pub fn delete_buffer(buffer_id: c_uint) {
+    delete_buffers(1,&vec![buffer_id])
 }
 
 pub fn get_attrib_location(program_id: c_uint, name: &str) -> c_uint {
