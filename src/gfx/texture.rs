@@ -29,7 +29,7 @@ impl GfxTexture {
 
     pub fn load(&self, image_data: &ImageData) {
         crate::active_texture(self.texture_unit);
-        crate::bind_texture(crate::def::TextureTarget::Texture2D, self);
+        crate::bind_texture(crate::def::TextureTarget::Texture2D, self.id);
 
         crate::tex_image_2d(crate::def::TextureTarget::Texture2D, 0, crate::def::PixelInternalFormat::Rgba, image_data.width, image_data.height, 0, crate::def::PixelFormat::Rgba, crate::def::PixelType::UnsignedByte, Some(&image_data.value));
 

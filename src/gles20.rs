@@ -2,7 +2,7 @@ use libc::{c_char, c_float, c_int, c_uint};
 
 use crate::{
     def::StringName,
-    ffi, GfxProgram, GfxTexture,
+    ffi
 };
 use std::{
     ffi::{CStr, CString},
@@ -314,9 +314,9 @@ pub fn active_texture(texture_unit: crate::def::TextureUnit) {
     }
 }
 
-pub fn bind_texture(texture_target: crate::def::TextureTarget, texture: &GfxTexture) {
+pub fn bind_texture(texture_target: crate::def::TextureTarget, texture_id: c_uint) {
     unsafe {
-        crate::ffi::glBindTexture(texture_target as _, texture.id);
+        crate::ffi::glBindTexture(texture_target as _, texture_id);
     }
 }
 
