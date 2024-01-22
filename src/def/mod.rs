@@ -14,6 +14,8 @@ mod generate_mipmap_target;
 mod texture_parameter_name;
 mod texture_wrap_mode;
 mod draw_element_type;
+mod enable_cap;
+mod blending_factor;
 
 pub use string_name::*;
 pub use shader_type::*;
@@ -31,3 +33,5 @@ pub use generate_mipmap_target::*;
 pub use texture_parameter_name::*;
 pub use texture_wrap_mode::*;
 pub use draw_element_type::*;
+pub use enable_cap::*;
+pub use blending_factor::*;

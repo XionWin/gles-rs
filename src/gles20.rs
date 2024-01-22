@@ -24,6 +24,18 @@ pub fn get_string(name: StringName) -> Option<String> {
     }
 }
 
+pub fn enable(enale_cap: crate::def::EnableCap) {
+    unsafe {
+        ffi::glEnable(enale_cap as _);
+    }
+}
+
+pub fn disable(enale_cap: crate::def::EnableCap) {
+    unsafe {
+        ffi::glDisable(enale_cap as _);
+    }
+}
+
 pub fn get_uniform_location(program: &GfxProgram, name: &str) -> c_int {
     unsafe {
         let c_str = CString::new(name).unwrap();
@@ -250,5 +262,11 @@ pub fn tex_parameter_i(
 pub fn generate_mipmap(generate_mipmap_target: crate::def::GenerateMipmapTarget) {
     unsafe {
         crate::ffi::glGenerateMipmap(generate_mipmap_target as _);
+    }
+}
+
+pub fn blend_func(sfactor: crate::def::BlendingFactor, dfactor: crate::def::BlendingFactor) {
+    unsafe {
+        crate::ffi::glBlendFunc(sfactor as _, dfactor as _);
     }
 }
