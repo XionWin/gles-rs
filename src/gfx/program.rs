@@ -9,7 +9,6 @@ pub struct GfxProgram {
     pub(crate) id: c_uint,
     pub(crate) vertex_shader: super::GfxShader,
     pub(crate) fragment_shader: super::GfxShader,
-
     pub(crate) textures: Vec<super::GfxTexture>,
 }
 
