@@ -61,7 +61,7 @@ pub fn delete_shader(shader_id: c_uint)  {
 }
 
 pub fn shader_source(shader_id: c_uint, source_code: &str)  { 
-    let mut source = source_code.bytes().collect::<Vec<libc::c_char>>();
+    let mut source = source_code.bytes().collect::<Vec<_>>();
     source.push(b'\0');
     let sources = vec![source.as_ptr()];
     unsafe {

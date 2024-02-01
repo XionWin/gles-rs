@@ -1,6 +1,6 @@
 impl crate::GfxShader {
     pub(crate) fn load(self) -> Self {
-        let mut source = (&self.source).bytes().collect::<Vec<libc::c_char>>();
+        let mut source = (&self.source).bytes().collect::<Vec<_>>();
         source.push(b'\0');
         let sources = vec![source.as_ptr()];
         unsafe {
